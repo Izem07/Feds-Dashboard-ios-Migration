@@ -274,8 +274,6 @@ web-build/
 .run/
 migrate_working_dir/
 GeneratedPluginRegistrant.java
-# Lock files for library packages (apps keep theirs)
-**/packages/**/pubspec.lock
 
 
 
