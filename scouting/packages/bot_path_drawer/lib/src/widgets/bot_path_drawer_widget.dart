@@ -341,7 +341,7 @@ class _BotPathDrawerState extends State<BotPathDrawer>
     if (_lastScaledSize == canvasSize && _cachedScaledCurves.isNotEmpty) {
       return _cachedScaledCurves;
     }
-    _cachedScaledCurves = _pathData!.scaledCurves(canvasSize, cropFraction: widget.config.cropFraction);
+    _cachedScaledCurves = _pathData!.scaledCurves(canvasSize);
     _lastScaledSize = canvasSize;
     return _cachedScaledCurves;
   }
@@ -362,7 +362,6 @@ class _BotPathDrawerState extends State<BotPathDrawer>
       rotations: result.rotations,
       timestamps: result.timestamps,
       canvasSize: _canvasSize,
-      cropFraction: widget.config.cropFraction,
     );
     _cachedScaledCurves = const [];
     _serializedData = _pathData!.serialize();
@@ -650,7 +649,7 @@ class _BotPathDrawerState extends State<BotPathDrawer>
   Offset? _endRobotPos(Size canvasSize) {
     final data = _pathData;
     if (data == null || data.curves.isEmpty) return null;
-    final endpoints = data.scaledEndpoints(canvasSize, cropFraction: widget.config.cropFraction);
+    final endpoints = data.scaledEndpoints(canvasSize);
     return endpoints.last;
   }
 
@@ -665,9 +664,7 @@ class _BotPathDrawerState extends State<BotPathDrawer>
   Offset? _scaledPlaybackPos(Size canvasSize) {
     final pos = _playbackRobotPos;
     if (pos == null) return null;
-    final scale = BotPathData.scaleFactor(
-      BotPathData.version, canvasSize, widget.config.cropFraction,
-    );
+    final scale = max(canvasSize.width, canvasSize.height);
     return Offset(pos.dx * scale, pos.dy * scale);
   }
 
