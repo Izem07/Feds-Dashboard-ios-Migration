@@ -29,9 +29,26 @@ jobs:
         run: dart run flutter_launcher_icons
         working-directory: dash
 
-      - name: Generate Flutter build files
-        run: flutter build ios --config-only
+      - name: Generate Flutter xcconfig
+        run: |
+          cat > ios/Flutter/Generated.xcconfig << 'EOF'
+          FLUTTER_ROOT=/Users/runner/hostedtoolcache/flutter/stable-latest-arm64/x64
+          FLUTTER_APPLICATION_PATH=${{ github.workspace }}/dash
+          COCOAPODS_PARALLEL_CODE_SIGN=true
+          FLUTTER_TARGET=${{ github.workspace }}/dash/lib/main.dart
+          FLUTTER_BUILD_DIR=build
+          FLUTTER_BUILD_NAME=1.0.0
+          FLUTTER_BUILD_NUMBER=1
+          DART_OBFUSCATION=false
+          TRACK_WIDGET_CREATION=false
+          TREE_SHAKE_ICONS=false
+          PACKAGE_CONFIG=${{ github.workspace }}/dash/.dart_tool/package_config.json
+          EOF
         working-directory: dash
+
+      - name: Install pods
+        run: pod install
+        working-directory: dash/ios
 
       - name: Build iOS with xcodebuild
         run: |
