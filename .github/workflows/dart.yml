@@ -2,6 +2,9 @@ name: Dashboard v1.0.0
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'v1.0.0'
 
 jobs:
   build-ios:
@@ -10,45 +13,44 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          architecture: x64
 
       - name: Link ios into dash
         run: ln -sf "$GITHUB_WORKSPACE/ios" "$GITHUB_WORKSPACE/dash/ios"
 
-      - run: flutter pub get
+      - name: Flutter pub get
+        run: flutter pub get
         working-directory: dash
 
       - name: Generate iOS app icons
-        run: flutter pub run flutter_launcher_icons
+        run: dart run flutter_launcher_icons
         working-directory: dash
 
-      - run: pod repo update
+      - name: Pod install
+        run: pod install --repo-update
         working-directory: dash/ios
 
-      - run: flutter build ios --release --no-codesign
+      - name: Build iOS (no codesign)
+        run: flutter build ios --release --no-codesign
         working-directory: dash
 
-      - run: mkdir Payload
+      - name: Package IPA
+        run: |
+          mkdir Payload
+          mv Runner.app Payload
+          zip -qq -r -9 "FedsDash-v1.0.0.ipa" Payload
         working-directory: dash/build/ios/iphoneos
 
-      - run: mv Runner.app/ Payload
-        working-directory: dash/build/ios/iphoneos
-
-      - name: Zip output
-        run: zip -qq -r -9 "Feds Dash v1.0.0.ipa" Payload
-        working-directory: dash/build/ios/iphoneos
-
-      - name: Upload binaries to release
+      - name: Upload to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "dash/build/ios/iphoneos/Feds Dash v1.0.0.ipa"
+          file: dash/build/ios/iphoneos/FedsDash-v1.0.0.ipa
           tag: v1.0.0
-          release_name: Dashboard v1.0.0
+          release_name: "Dashboard v1.0.0"
           overwrite: true
-          body: "first release"
+          body: "First release"
