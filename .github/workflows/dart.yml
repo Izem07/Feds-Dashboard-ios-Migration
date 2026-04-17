@@ -1,11 +1,11 @@
-name: iOS-ipa-build
+name: Dashboard v1.0.0
 
 on:
   workflow_dispatch:
 
 jobs:
   build-ios:
-    name: iOS App Build
+    name: Feds Dash iOS Build
     runs-on: macos-latest
     permissions:
       contents: write
@@ -40,14 +40,15 @@ jobs:
         working-directory: dash/build/ios/iphoneos
 
       - name: Zip output
-        run: zip -qq -r -9 "ScoutOps Dash v1.0.0.ipa" Payload
+        run: zip -qq -r -9 "Feds Dash v1.0.0.ipa" Payload
         working-directory: dash/build/ios/iphoneos
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "dash/build/ios/iphoneos/ScoutOps Dash v1.0.0.ipa"
+          file: "dash/build/ios/iphoneos/Feds Dash v1.0.0.ipa"
           tag: v1.0.0
+          release_name: Dashboard v1.0.0
           overwrite: true
           body: "first release"
