@@ -1,6 +1,8 @@
-import 'dart:html' as html;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../services/csv_picker_stub.dart'
+    if (dart.library.html) '../services/csv_picker_web.dart';
 import '../services/data_service.dart';
 import '../services/local_prefs.dart';
 import '../theme.dart';
@@ -70,18 +72,10 @@ class _EventEntryScreenState extends State<EventEntryScreen>
   }
 
   void _pickCsv() {
-    final input = html.FileUploadInputElement()..accept = '.csv';
-    input.click();
-    input.onChange.listen((_) {
-      final file = input.files?.first;
-      if (file == null) return;
-      final reader = html.FileReader();
-      reader.readAsText(file);
-      reader.onLoadEnd.listen((_) {
-        setState(() {
-          _csvFileName = file.name;
-          _csvContent = reader.result as String?;
-        });
+    pickCsvFile((name, content) {
+      setState(() {
+        _csvFileName = name;
+        _csvContent = content;
       });
     });
   }
@@ -237,85 +231,89 @@ class _EventEntryScreenState extends State<EventEntryScreen>
                     const SizedBox(height: 16),
 
                     // ── CSV Upload ───────────────────────────────────
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Row(children: [
-                              Icon(Icons.upload_file_rounded,
-                                  size: 18, color: AppTheme.accent),
-                              const SizedBox(width: 8),
-                              Text('CSV File',
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium),
-                            ]),
-                            const SizedBox(height: 10),
-                            Row(children: [
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: AppTheme.surfaceHi,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: AppTheme.border),
-                                  ),
-                                  child: Text(
-                                    _csvFileName ?? 'No file selected',
-                                    style: TextStyle(
-                                      color: _csvFileName != null
-                                          ? AppTheme.text
-                                          : AppTheme.muted,
-                                      fontSize: 13,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              SizedBox(
-                                height: 40,
-                                child: OutlinedButton(
-                                  onPressed: _pickCsv,
-                                  style: OutlinedButton.styleFrom(
-                                    side: BorderSide(
-                                        color:
-                                            AppTheme.accent.withOpacity(0.4)),
+                    if (kIsWeb)
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(children: [
+                                Icon(Icons.upload_file_rounded,
+                                    size: 18, color: AppTheme.accent),
+                                const SizedBox(width: 8),
+                                Text('CSV File',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium),
+                              ]),
+                              const SizedBox(height: 10),
+                              Row(children: [
+                                Expanded(
+                                  child: Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 14),
-                                  ),
-                                  child: Text('Browse',
+                                        horizontal: 12, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.surfaceHi,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border:
+                                          Border.all(color: AppTheme.border),
+                                    ),
+                                    child: Text(
+                                      _csvFileName ?? 'No file selected',
                                       style: TextStyle(
-                                          color: AppTheme.accent,
-                                          fontSize: 13)),
+                                        color: _csvFileName != null
+                                            ? AppTheme.text
+                                            : AppTheme.muted,
+                                        fontSize: 13,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  height: 40,
+                                  child: OutlinedButton(
+                                    onPressed: _pickCsv,
+                                    style: OutlinedButton.styleFrom(
+                                      side: BorderSide(
+                                          color:
+                                              AppTheme.accent.withOpacity(0.4)),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 14),
+                                    ),
+                                    child: Text('Browse',
+                                        style: TextStyle(
+                                            color: AppTheme.accent,
+                                            fontSize: 13)),
+                                  ),
+                                ),
+                              ]),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                height: 44,
+                                child: ElevatedButton.icon(
+                                  onPressed: (loading || _csvContent == null)
+                                      ? null
+                                      : _loadCsv,
+                                  icon: loading
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: AppTheme.bg))
+                                      : const Icon(Icons.upload_rounded,
+                                          size: 18),
+                                  label: const Text('Load CSV'),
                                 ),
                               ),
-                            ]),
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              height: 44,
-                              child: ElevatedButton.icon(
-                                onPressed: (loading || _csvContent == null)
-                                    ? null
-                                    : _loadCsv,
-                                icon: loading
-                                    ? const SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 2, color: AppTheme.bg))
-                                    : const Icon(Icons.upload_rounded,
-                                        size: 18),
-                                label: const Text('Load CSV'),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
+                    if (kIsWeb) const SizedBox(height: 12),
 
                     // ── Neon Database ─────────────────────────────────
                     Card(
