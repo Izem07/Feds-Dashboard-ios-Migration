@@ -16,7 +16,7 @@ class EventEntryScreen extends StatefulWidget {
 
 class _EventEntryScreenState extends State<EventEntryScreen>
     with SingleTickerProviderStateMixin {
-  final _eventKeyCtl = TextEditingController(text: '2026mimid');
+  final _eventKeyCtl = TextEditingController(text: '2026');
   final _tableCtl = TextEditingController(text: 'scouting_data');
   final _neonCtl = TextEditingController();
   final _tbaCtl = TextEditingController();
@@ -162,9 +162,7 @@ class _EventEntryScreenState extends State<EventEntryScreen>
         backgroundColor: AppTheme.red.withOpacity(0.85),
         duration: const Duration(seconds: 6),
         action: SnackBarAction(
-            label: 'DISMISS',
-            textColor: Colors.white,
-            onPressed: () {}),
+            label: 'DISMISS', textColor: Colors.white, onPressed: () {}),
       ),
     );
   }
@@ -192,7 +190,8 @@ class _EventEntryScreenState extends State<EventEntryScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          width: 44, height: 44,
+                          width: 44,
+                          height: 44,
                           decoration: BoxDecoration(
                             color: AppTheme.accent.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(12),
@@ -215,8 +214,8 @@ class _EventEntryScreenState extends State<EventEntryScreen>
                     const SizedBox(height: 32),
 
                     // ── Shared fields ────────────────────────────────
-                    _field(_eventKeyCtl, 'Event Key', '2026mimid',
-                        Icons.event_rounded),
+                    _field(
+                        _eventKeyCtl, 'Event Key', '2026', Icons.event_rounded),
                     const SizedBox(height: 12),
                     _field(_tbaCtl, 'TBA API Key', 'X-TBA-Auth-Key',
                         Icons.vpn_key_rounded,
@@ -228,11 +227,9 @@ class _EventEntryScreenState extends State<EventEntryScreen>
                       children: [
                         const Expanded(child: Divider()),
                         Padding(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Text('Load scouting data from',
-                              style:
-                                  Theme.of(context).textTheme.bodySmall),
+                              style: Theme.of(context).textTheme.bodySmall),
                         ),
                         const Expanded(child: Divider()),
                       ],
@@ -251,9 +248,8 @@ class _EventEntryScreenState extends State<EventEntryScreen>
                                   size: 18, color: AppTheme.accent),
                               const SizedBox(width: 8),
                               Text('CSV File',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium),
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium),
                             ]),
                             const SizedBox(height: 10),
                             Row(children: [
@@ -264,8 +260,7 @@ class _EventEntryScreenState extends State<EventEntryScreen>
                                   decoration: BoxDecoration(
                                     color: AppTheme.surfaceHi,
                                     borderRadius: BorderRadius.circular(8),
-                                    border:
-                                        Border.all(color: AppTheme.border),
+                                    border: Border.all(color: AppTheme.border),
                                   ),
                                   child: Text(
                                     _csvFileName ?? 'No file selected',
@@ -286,8 +281,8 @@ class _EventEntryScreenState extends State<EventEntryScreen>
                                   onPressed: _pickCsv,
                                   style: OutlinedButton.styleFrom(
                                     side: BorderSide(
-                                        color: AppTheme.accent
-                                            .withOpacity(0.4)),
+                                        color:
+                                            AppTheme.accent.withOpacity(0.4)),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 14),
                                   ),
@@ -302,16 +297,15 @@ class _EventEntryScreenState extends State<EventEntryScreen>
                             SizedBox(
                               height: 44,
                               child: ElevatedButton.icon(
-                                onPressed:
-                                    (loading || _csvContent == null)
-                                        ? null
-                                        : _loadCsv,
+                                onPressed: (loading || _csvContent == null)
+                                    ? null
+                                    : _loadCsv,
                                 icon: loading
                                     ? const SizedBox(
-                                        width: 18, height: 18,
+                                        width: 18,
+                                        height: 18,
                                         child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: AppTheme.bg))
+                                            strokeWidth: 2, color: AppTheme.bg))
                                     : const Icon(Icons.upload_rounded,
                                         size: 18),
                                 label: const Text('Load CSV'),
@@ -335,9 +329,8 @@ class _EventEntryScreenState extends State<EventEntryScreen>
                                   size: 18, color: AppTheme.gold),
                               const SizedBox(width: 8),
                               Text('Neon Database',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium),
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium),
                             ]),
                             const SizedBox(height: 10),
                             _field(
@@ -347,11 +340,8 @@ class _EventEntryScreenState extends State<EventEntryScreen>
                                 Icons.link_rounded,
                                 obscure: true),
                             const SizedBox(height: 10),
-                            _field(
-                                _tableCtl,
-                                'Scouting Table Name',
-                                'scouting_data',
-                                Icons.table_chart_rounded),
+                            _field(_tableCtl, 'Scouting Table Name',
+                                'scouting_data', Icons.table_chart_rounded),
                             const SizedBox(height: 12),
                             SizedBox(
                               height: 44,
@@ -361,12 +351,11 @@ class _EventEntryScreenState extends State<EventEntryScreen>
                                     backgroundColor: AppTheme.gold),
                                 icon: loading
                                     ? const SizedBox(
-                                        width: 18, height: 18,
+                                        width: 18,
+                                        height: 18,
                                         child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: AppTheme.bg))
-                                    : const Icon(
-                                        Icons.cloud_download_rounded,
+                                            strokeWidth: 2, color: AppTheme.bg))
+                                    : const Icon(Icons.cloud_download_rounded,
                                         size: 18),
                                 label: const Text('Load from Neon'),
                               ),
@@ -385,8 +374,8 @@ class _EventEntryScreenState extends State<EventEntryScreen>
     );
   }
 
-  Widget _field(TextEditingController ctl, String label, String hint,
-      IconData icon,
+  Widget _field(
+      TextEditingController ctl, String label, String hint, IconData icon,
       {bool obscure = false}) {
     return TextFormField(
       controller: ctl,

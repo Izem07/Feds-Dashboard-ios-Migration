@@ -27,9 +27,6 @@ jobs:
         run: flutter pub run flutter_launcher_icons
         working-directory: dash
 
-      - run: pod repo update
-        working-directory: dash/ios
-
       - run: flutter build ios --release --no-codesign
         working-directory: dash
 
