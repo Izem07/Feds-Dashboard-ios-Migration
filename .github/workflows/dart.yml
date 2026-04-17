@@ -10,21 +10,21 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           architecture: x64
 
-      - name: Link ios folder into dash
-        run: rm -rf "$GITHUB_WORKSPACE/dash/ios" && ln -s "$GITHUB_WORKSPACE/ios" "$GITHUB_WORKSPACE/dash/ios"
+      - name: Link ios into dash
+        run: ln -sf "$GITHUB_WORKSPACE/ios" "$GITHUB_WORKSPACE/dash/ios"
 
       - run: flutter pub get
         working-directory: dash
 
       - name: Generate iOS app icons
-        run: dart run flutter_launcher_icons
+        run: flutter pub run flutter_launcher_icons
         working-directory: dash
 
       - run: pod repo update

@@ -1,41 +1,55 @@
 import 'dart:convert';
-import 'dart:js_interop';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:http/http.dart' as http;
 
-/// Queries a Neon PostgreSQL database by calling the `@neondatabase/serverless`
-/// JavaScript driver that's loaded in `index.html`.
+// Web-only JS interop — only imported on web builds
+import 'neon_service_web.dart' if (dart.library.io) 'neon_service_io.dart'
+    as platform;
+
+/// Queries a Neon PostgreSQL database.
 ///
-/// This avoids CORS issues because the JS driver uses the correct fetch mode
-/// natively — it was designed for browser use.
+/// On web: calls the `@neondatabase/serverless` JS driver loaded in index.html.
+/// On iOS/native: uses Neon's HTTP API directly.
 class NeonService {
   NeonService(this.connectionString);
   final String connectionString;
 
-  // ── Public API ─────────────────────────────────────────────────────
-
-  /// Run [sql] with optional [params] and return a list of row maps.
   Future<List<Map<String, dynamic>>> query(String sql,
       [List<dynamic> params = const []]) async {
+    if (kIsWeb) {
+      return platform.queryWeb(connectionString, sql, params);
+    } else {
+      return _queryHttp(sql, params);
+    }
+  }
 
-    final paramsJson = jsonEncode(params);
+  Future<List<Map<String, dynamic>>> _queryHttp(
+      String sql, List<dynamic> params) async {
+    final uri = Uri.parse(connectionString);
+    final host = uri.host;
+    final endpoint = Uri.https(host, '/sql');
 
-    // Call the global JS function: neonQuery(connStr, sql, paramsJson)
-    final promise = _neonQuery(
-      connectionString.toJS,
-      sql.toJS,
-      paramsJson.toJS,
+    final response = await http.post(
+      endpoint,
+      headers: {
+        'Content-Type': 'application/json',
+        'Neon-Connection-String': connectionString,
+      },
+      body: jsonEncode({'query': sql, 'params': params}),
     );
 
-    final JSString jsResult = await promise.toDart as JSString;
-    final resultStr = jsResult.toDart;
-    final decoded = jsonDecode(resultStr) as Map<String, dynamic>;
+    if (response.statusCode != 200) {
+      throw NeonException('HTTP ${response.statusCode}: ${response.body}');
+    }
 
-    // Check for errors from the JS side.
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+
     if (decoded.containsKey('error')) {
       throw NeonException(decoded['error'] as String);
     }
 
     final fields = (decoded['fields'] as List<dynamic>?)
-            ?.map((f) => f.toString())
+            ?.map((f) => (f as Map)['name'].toString())
             .toList() ??
         [];
     final rows = decoded['rows'] as List<dynamic>? ?? [];
@@ -57,12 +71,10 @@ class NeonService {
     }).toList();
   }
 
-  /// Fetch every row in [table].
   Future<List<Map<String, dynamic>>> fetchAll(String table) async {
     return query('SELECT * FROM "$table"');
   }
 
-  /// Return the column names for [table].
   Future<List<String>> columns(String table) async {
     final rows = await query(
       "SELECT column_name FROM information_schema.columns "
@@ -72,13 +84,6 @@ class NeonService {
     return rows.map((r) => r['column_name'] as String).toList();
   }
 }
-
-// ── JS interop binding ───────────────────────────────────────────────
-
-@JS('neonQuery')
-external JSPromise _neonQuery(JSString connString, JSString sql, JSString paramsJson);
-
-// ── Exception ────────────────────────────────────────────────────────
 
 class NeonException implements Exception {
   final String message;
