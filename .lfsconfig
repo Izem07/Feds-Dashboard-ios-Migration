@@ -1,2 +1,0 @@
-[lfs]
-	fetchexclude = **/sim_models/**

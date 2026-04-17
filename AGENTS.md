@@ -1,3 +1,0 @@
-- This is the monorepo for The FEDS (FIRST Robotics FRC Team 201).
-  - it contains ALL of their robot and non-robot code, and even game details / manuals
-- The current year is 2026 and the FIRST Robotics game for this year is "REBUILT"

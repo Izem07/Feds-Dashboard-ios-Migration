@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Dashboard (Chrome)",
+            "type": "dart",
+            "request": "launch",
+            "program": "${workspaceFolder}/scouting/dash/lib/main.dart",
+            "cwd": "${workspaceFolder}/scouting/dash",
+            "args": ["-d", "chrome"]
+        },
+        {
+            "name": "Launch Dashboard (Web Server)",
+            "type": "dart",
+            "request": "launch",
+            "program": "${workspaceFolder}/scouting/dash/lib/main.dart",
+            "cwd": "${workspaceFolder}/scouting/dash",
+            "args": ["-d", "web-server", "--web-port", "8080"]
+        }
+    ]
+}

@@ -1,8 +1,0 @@
-{
-  "ASDSim": "Absolute Sensor Discontinuity",
-  "MvMSim": "Motor vs Mechanism",
-  "PIDSim": "PID Motor Control",
-  "MotorVsMechanism": "Motor vs Mechanism Ratio",
-  "MotorControlConfigurator": "Motor Control System"
-}
-
