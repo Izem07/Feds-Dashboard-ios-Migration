@@ -20,9 +20,10 @@ jobs:
           cache: true
 
       - name: Link ios folder into dash
-        run: rm -rf ${{ github.workspace }}/dash/ios && ln -s ${{ github.workspace }}/ios ${{ github.workspace }}/dash/ios
+        run: rm -rf "$GITHUB_WORKSPACE/dash/ios" && ln -s "$GITHUB_WORKSPACE/ios" "$GITHUB_WORKSPACE/dash/ios"
 
-      - run: flutter pub get
+      - name: Flutter pub get
+        run: flutter pub get
         working-directory: dash
 
       - name: Generate iOS app icons
@@ -32,26 +33,26 @@ jobs:
       - name: Generate Flutter xcconfig
         run: |
           FLUTTER_ROOT=$(dirname $(dirname $(which flutter)))
-          APP_PATH="${{ github.workspace }}/dash"
-          cat > ${{ github.workspace }}/ios/Flutter/Generated.xcconfig << EOF
-FLUTTER_ROOT=$FLUTTER_ROOT
-FLUTTER_APPLICATION_PATH=$APP_PATH
-COCOAPODS_PARALLEL_CODE_SIGN=true
-FLUTTER_TARGET=$APP_PATH/lib/main.dart
-FLUTTER_BUILD_DIR=build
-FLUTTER_BUILD_NAME=1.0.0
-FLUTTER_BUILD_NUMBER=1
-DART_OBFUSCATION=false
-TRACK_WIDGET_CREATION=false
-TREE_SHAKE_ICONS=false
-PACKAGE_CONFIG=$APP_PATH/.dart_tool/package_config.json
-EOF
+          APP_PATH="$GITHUB_WORKSPACE/dash"
+          {
+            echo "FLUTTER_ROOT=$FLUTTER_ROOT"
+            echo "FLUTTER_APPLICATION_PATH=$APP_PATH"
+            echo "COCOAPODS_PARALLEL_CODE_SIGN=true"
+            echo "FLUTTER_TARGET=$APP_PATH/lib/main.dart"
+            echo "FLUTTER_BUILD_DIR=build"
+            echo "FLUTTER_BUILD_NAME=1.0.0"
+            echo "FLUTTER_BUILD_NUMBER=1"
+            echo "DART_OBFUSCATION=false"
+            echo "TRACK_WIDGET_CREATION=false"
+            echo "TREE_SHAKE_ICONS=false"
+            echo "PACKAGE_CONFIG=$APP_PATH/.dart_tool/package_config.json"
+          } > "$GITHUB_WORKSPACE/ios/Flutter/Generated.xcconfig"
 
       - name: Install pods
         run: pod install
         working-directory: dash/ios
 
-      - name: Build Flutter kernel
+      - name: Build iOS
         run: flutter build ios --release --no-codesign --no-tree-shake-icons
         working-directory: dash
 
@@ -62,7 +63,7 @@ EOF
           zip -qq -r -9 "Feds Dash v1.0.0.ipa" Payload
         working-directory: dash
 
-      - name: Upload binaries to release
+      - name: Upload to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
