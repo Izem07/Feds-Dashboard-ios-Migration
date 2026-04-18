@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../services/data_service.dart';
 import '../theme.dart';
 
-/// One column of team data: OPR, EPA, then all pit scouting fields.
 class TeamDataColumn extends StatelessWidget {
   const TeamDataColumn({
     super.key,
@@ -14,10 +13,15 @@ class TeamDataColumn extends StatelessWidget {
   final int teamNumber;
   final int slotIndex;
 
-  // Columns to hide from the data display.
   static const _hideCols = {
-    'pathdraw', 'id', 'created_at', 'team', 'eventkey',
-    'botimage1', 'botimage2', 'botimage3',
+    'pathdraw',
+    'id',
+    'created_at',
+    'team',
+    'eventkey',
+    'botimage1',
+    'botimage2',
+    'botimage3',
   };
 
   @override
@@ -35,48 +39,48 @@ class TeamDataColumn extends StatelessWidget {
 
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: color.withOpacity(0.20)),
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: color.withValues(alpha: 0.20)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header ───────────────────────────────────────────────
+            // ── Header ─────────────────────────────────────────────
             Row(
               children: [
                 Container(
-                  width: 10, height: 10,
-                  decoration: BoxDecoration(
-                      color: color, shape: BoxShape.circle),
+                  width: 12,
+                  height: 12,
+                  decoration:
+                      BoxDecoration(color: color, shape: BoxShape.circle),
                 ),
-                const SizedBox(width: 8),
-                Text('$teamNumber',
-                    style: AppTheme.mono(16, color: color)),
+                const SizedBox(width: 10),
+                Text('$teamNumber', style: AppTheme.mono(18, color: color)),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 14),
 
-            // ── OPR / EPA ────────────────────────────────────────────
+            // ── OPR / EPA ───────────────────────────────────────────
             Row(
               children: [
                 _MetricBadge(label: 'OPR', value: opr, color: AppTheme.accent),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 _MetricBadge(label: 'EPA', value: epa, color: AppTheme.gold),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 14),
             const Divider(height: 1),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
-            // ── Scouting fields ──────────────────────────────────────
+            // ── Scouting fields ─────────────────────────────────────
             if (displayEntries.isEmpty)
-              Text('No scouting data',
-                  style: TextStyle(color: AppTheme.muted, fontSize: 11))
+              const Text('No scouting data',
+                  style: TextStyle(color: AppTheme.muted, fontSize: 13))
             else
               ...displayEntries.map((e) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.only(bottom: 8),
                     child: Row(
                       children: [
                         Expanded(
@@ -84,18 +88,18 @@ class TeamDataColumn extends StatelessWidget {
                           child: Text(
                             _formatCol(e.key),
                             style: const TextStyle(
-                                color: AppTheme.muted, fontSize: 11),
+                                color: AppTheme.muted, fontSize: 13),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 8),
                         Expanded(
                           flex: 4,
                           child: Align(
                             alignment: Alignment.centerRight,
                             child: Text(
                               _displayVal(e.value),
-                              style: AppTheme.mono(11),
+                              style: AppTheme.mono(13),
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.right,
                             ),
@@ -110,26 +114,20 @@ class TeamDataColumn extends StatelessWidget {
     );
   }
 
-  static String _formatCol(String col) {
-    return col
-        .replaceAll('_', ' ')
-        .split(' ')
-        .map((w) =>
-            w.isEmpty ? w : '${w[0].toUpperCase()}${w.substring(1)}')
-        .join(' ');
-  }
+  static String _formatCol(String col) => col
+      .replaceAll('_', ' ')
+      .split(' ')
+      .map((w) => w.isEmpty ? w : '${w[0].toUpperCase()}${w.substring(1)}')
+      .join(' ');
 
   static String _displayVal(dynamic v) {
     if (v == null) return '—';
     if (v is double) return v.toStringAsFixed(2);
     final str = v.toString();
-    // Truncate long JSON arrays / objects.
     if (str.length > 30) return '${str.substring(0, 27)}…';
     return str;
   }
 }
-
-// ═════════════════════════════════════════════════════════════════════
 
 class _MetricBadge extends StatelessWidget {
   const _MetricBadge({
@@ -146,23 +144,23 @@ class _MetricBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.06),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: color.withOpacity(0.12)),
+          color: color.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withValues(alpha: 0.15)),
         ),
         child: Row(
           children: [
             Text(label,
                 style: TextStyle(
-                    color: color.withOpacity(0.7),
-                    fontSize: 10,
+                    color: color.withValues(alpha: 0.7),
+                    fontSize: 12,
                     fontWeight: FontWeight.w600)),
             const Spacer(),
             Text(
               value != null ? value!.toStringAsFixed(1) : '—',
-              style: AppTheme.mono(13, color: color),
+              style: AppTheme.mono(15, color: color),
             ),
           ],
         ),

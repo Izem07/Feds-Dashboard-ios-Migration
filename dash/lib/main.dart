@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:url_strategy/url_strategy.dart';
 
 import 'services/data_service.dart';
 import 'services/local_prefs.dart';
+import 'services/url_strategy_stub.dart'
+    if (dart.library.html) 'services/url_strategy_web.dart';
 import 'theme.dart';
 import 'screens/event_entry_screen.dart';
 import 'screens/comparison_screen.dart';
 
-void main() {
-  setPathUrlStrategy();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Lock to portrait on mobile.
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  initUrlStrategy();
 
   final dataService = DataService();
   final config = LocalPrefs.resolveConfig();

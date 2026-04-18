@@ -1,10 +1,10 @@
-name: Dashboard v1.0.0
+name: Dashboard v1.0.1
 
 on:
   workflow_dispatch:
   push:
     tags:
-      - 'v1.0.0'
+      - 'v1.0.1'
 
 jobs:
   build-ios:
@@ -42,15 +42,15 @@ jobs:
         run: |
           mkdir Payload
           mv Runner.app Payload
-          zip -qq -r -9 "FedsDash-v1.0.0.ipa" Payload
+          zip -qq -r -9 "FedsDash-v1.0.1.ipa" Payload
         working-directory: dash/build/ios/iphoneos
 
       - name: Upload to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: dash/build/ios/iphoneos/FedsDash-v1.0.0.ipa
-          tag: v1.0.0
-          release_name: "Dashboard v1.0.0"
+          file: dash/build/ios/iphoneos/FedsDash-v1.0.1.ipa
+          tag: v1.0.1
+          release_name: "Dashboard v1.0.1"
           overwrite: true
-          body: "First release"
+          body: "iOS mobile UI, pre-filled event config"
